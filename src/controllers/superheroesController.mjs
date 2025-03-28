@@ -1,7 +1,9 @@
 //import SuperHeroRepository from "../repositories/SuperHeroRepository.mjs";
-import { obtenerSuperheroePorId,obtenerTodosLosSuperheroes,buscarSuperheroesPorAtributo, obtenerSuperheroesMayoresDe30 } from "../services/superheroesService.mjs";
+import { obtenerSuperheroePorId, obtenerTodosLosSuperheroes, buscarSuperheroesPorAtributo, obtenerSuperheroesMayoresDe30 } from "../services/superheroesService.mjs";
 import {renderizarSuperheroe, renderizaListaSuperheroes} from '../views/responsiveView.mjs';
 //import mongoose from "mongoose";
+import SuperHero from "../models/superheroeModel.mjs";
+import {crearSuperheroe,actualizarSuperheroe} from "../services/superheroesService.mjs"
                                 
 export async function obtenerSuperheroePorIdController(req,res) {
    try{
@@ -36,6 +38,66 @@ export async function obtenerTodosLosSuperheroesController(req,res){
         res.status(500).json({mensaje: "Error al obtener los superheroes",error: error.message});
     }
 }
+
+export const crearSuperheroeController = async (req, res) => {
+try {
+    const { nombreSuperHeroe, nombreReal,  edad, planetaOrigen, debilidad, poderes, aliados, enemigos } = req.body;
+    if (!nombreReal || !nombreSuperHeroe || !edad || !poderes) {
+        return res.status(400).json({
+            mensaje: "Error al crear el superhéroe",
+            error: "Todos los campos son obligatorios"
+        });
+    }
+
+    // Continuar con la creación del superhéroe
+    
+        const nuevoSuperheroe = new SuperHero({ 
+            nombreSuperHeroe, 
+            nombreReal, 
+            edad,
+            planetaOrigen,
+            debilidad,
+            poderes,
+            aliados,
+            enemigos
+        });
+        await nuevoSuperheroe.save();
+        res.status(201).json(nuevoSuperheroe);
+    } catch (error) {
+        res.status(500).json({
+            mensaje: "Error al crear el superhéroe",
+            error: error.message
+        });
+    }
+};
+
+export const actualizarSuperheroeController = async (req, res) => {
+    try {
+        const { id } = req.params; // Obtener el ID del superhéroe desde la URL
+        const datosActualizados = req.body; // Obtener los datos a actualizar
+
+        // Buscar y actualizar el superhéroe
+        const superheroeActualizado = await SuperHero.findByIdAndUpdate(
+            id, 
+            datosActualizados, 
+            { new: true, runValidators: true }
+        );
+
+        if (!superheroeActualizado) {
+            return res.status(404).json({
+                mensaje: "Superhéroe no encontrado",
+            });
+        }
+
+        res.json(superheroeActualizado);
+    } catch (error) {
+        res.status(500).json({
+            mensaje: "Error al actualizar el superhéroe",
+            error: error.message
+        });
+    }
+};
+
 
 export async function buscarSuperheroesPorAtributoController(req,res){
     try{

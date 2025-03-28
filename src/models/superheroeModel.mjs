@@ -14,6 +14,6 @@ const superheroSchema=new mongoose.Schema({
     createdAt: {type:Date,default:Date.now},
     creador:{type:String, default:'Sebastián Guaraz'}
 });
-const superHero = mongoose.model('SuperHero', superheroSchema, "Grupo-14");
-export default superHero
+const SuperHero = mongoose.model('SuperHero', superheroSchema, "Grupo-14");
+export default SuperHero;
 

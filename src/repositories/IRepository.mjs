@@ -7,6 +7,11 @@ obtenerPorID(id) {
 obtenerTodos() {
     throw new Error("Método 'obtenerTodos()' no implementado");
 }
+
+nuevoHeroe(){
+    throw new Error("Método `buscarPorAtributo()` no implementado");
+}
+
 buscarPorAtributo(atributo, valor){
     throw new Error("Método `buscarPorAtributo()` no implementado");
 }

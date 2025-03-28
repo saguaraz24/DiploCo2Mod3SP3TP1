@@ -1,9 +1,12 @@
 import express from 'express';
 import {connectDB} from './src/config/dbConfig.mjs'
+import bodyParser from "body-parser";
 import superHeroRoutes from './src/routes/superHeroRoutes.mjs';
 //C:\Users\sagua\DiploCo2Mod3\DiploCo2Mod3Spt2TP3\config\dbConfig.mjs
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+app.use(bodyParser.json()); // Habilita el parsing de JSON
 
 //Middleware para parsear Json
 app.use(express.json());
