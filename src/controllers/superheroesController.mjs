@@ -1,9 +1,9 @@
 //import SuperHeroRepository from "../repositories/SuperHeroRepository.mjs";
-import { obtenerSuperheroePorId, obtenerTodosLosSuperheroes, buscarSuperheroesPorAtributo, obtenerSuperheroesMayoresDe30 } from "../services/superheroesService.mjs";
+import { obtenerSuperheroePorId, obtenerTodosLosSuperheroes, buscarSuperheroesPorAtributo, obtenerSuperheroesMayoresDe30} from "../services/superheroesService.mjs";
 import {renderizarSuperheroe, renderizaListaSuperheroes} from '../views/responsiveView.mjs';
 //import mongoose from "mongoose";
 import SuperHero from "../models/superheroeModel.mjs";
-import {crearSuperheroe,actualizarSuperheroe} from "../services/superheroesService.mjs"
+import {crearSuperheroe,actualizarSuperheroe, eliminarSuperheroe, eliminarSuperheroePorNombre} from "../services/superheroesService.mjs"
                                 
 export async function obtenerSuperheroePorIdController(req,res) {
    try{
@@ -98,6 +98,44 @@ export const actualizarSuperheroeController = async (req, res) => {
     }
 };
 
+export const eliminarSuperheroeController = async (req, res) => {
+    try {
+        const { id } = req.params;
+        console.log(`El ID para eliminar es: ${id}`);
+        const superheroeEliminado = await eliminarSuperheroe(id);
+        if (!superheroeEliminado) {
+            return res.status(404).json({ mensaje: "Superhéroe no encontrado" });
+        }
+
+        res.json({ mensaje: "Superhéroe eliminado exitosamente", superheroeEliminado });
+    } catch (error) {
+        res.status(500).json({ mensaje: "Error al eliminar el superhéroe", error: error.message });
+    }
+};
+
+export const eliminarSuperheroePorNombreController = async (req, res) => {
+     // Depuración: Verificar el valor del parámetro recibido
+     console.log("Todos los Superheroes Requerimiento");
+     console.log("Parámetros recibidos: ", req.params); 
+     
+    try {
+       
+        const { nombre } = req.params;
+        console.log("El nombre para eliminar es:", nombre);
+        if (!nombre) {
+            return res.status(400).json({ mensaje: "Debe proporcionar un nombre de superhéroe" });
+        }
+        //console.log(`El nombre para eliminar es: ${nombreSuperHeroe}`);
+        const superheroeEliminado = await eliminarSuperheroePorNombre(nombre);
+        if (!superheroeEliminado) {
+            return res.status(404).json({ mensaje: "Superhéroe no encontrado" });
+        }
+
+        res.json({ mensaje: "Superhéroe eliminado exitosamente", superheroeEliminado });
+    } catch (error) {
+        res.status(500).json({ mensaje: "Error al eliminar el superhéroe", error: error.message });
+    }
+};
 
 export async function buscarSuperheroesPorAtributoController(req,res){
     try{

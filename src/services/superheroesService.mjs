@@ -50,6 +50,29 @@ export const actualizarSuperheroe = async (id, datosActualizados) => {
     }
 };
 
+export const eliminarSuperheroe = async (id) => {
+    try {
+        const superheroeEliminado = await SuperHero.findByIdAndDelete(id);
+        console.log(`Se encontró el id a eliminar ${id}`);
+        return superheroeEliminado;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
+export const eliminarSuperheroePorNombre = async (nombreSuperHeroe) => {
+    try {
+        console.log("Buscando el superhéroe con nombre:", nombreSuperHeroe); // 🛠 Depuración
+        const superheroeEliminado = await SuperHero.findOneAndDelete({nombreSuperHeroe});
+        //console.log(`Se encontró el nombre a eliminar ${nombreSuperHeroe}`);
+        if (!superheroeEliminado) {
+            console.log(`No se encontró un superhéroe con el nombre: ${nombre}`);
+        }
+        return superheroeEliminado;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
 
 export async function buscarSuperheroesPorAtributo(atributo,valor) {
     return await superHeroRepository.buscarPorAtributo(atributo,valor);
