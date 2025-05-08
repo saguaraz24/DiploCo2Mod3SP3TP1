@@ -4,7 +4,75 @@ import {renderizarSuperheroe, renderizaListaSuperheroes} from '../views/responsi
 //import mongoose from "mongoose";
 import SuperHero from "../models/superheroeModel.mjs";
 import {crearSuperheroe,actualizarSuperheroe, eliminarSuperheroe, eliminarSuperheroePorNombre} from "../services/superheroesService.mjs"
-                                
+         
+function validarNombreSuperheroe(nombre) {
+    const nombreLimpio = nombre?.trim();
+    if (!nombreLimpio) return 'Los nombres de Super Heroe y Real son obligatorios.';
+    if (nombreLimpio.length < 3) return 'Los nombres de Super Heroe y Real deben tener al menos 3 caracteres cada uno.';
+    if (nombreLimpio.length > 60) return 'Los nombres de Super Heroe y Real no debe superar los 60 caracteres cada uno.';
+    return null;
+  }
+  function validarEdad(edad) {
+    const edadLimpia = String(edad).trim();
+    if (edadLimpia === undefined || edadLimpia === null) {
+        return 'La edad es obligatoria.';
+      }
+    
+      // Si viene como string, intentamos convertir
+     
+    
+      if (edadLimpia === '') {
+        return 'La edad no puede estar vacía.';
+      }
+    
+      const edadNumero = Number(edadLimpia);
+    
+      if (isNaN(edadNumero)) {
+        return 'La edad debe ser un número.';
+      }
+    
+      if (edadNumero < 0) {
+        return 'La edad no puede ser negativa.';
+      }
+
+      return null;
+    
+  }
+  function validarPoderes(poderes) {
+    if (!Array.isArray(poderes)) {
+      return 'Poderes debe ser un arreglo.';
+    }
+  
+    if (poderes.length === 0) {
+      return 'Debe tener al menos un poder.';
+    }
+  
+    for (let i = 0; i < poderes.length; i++) {
+      const poder = poderes[i];
+  
+      if (typeof poder !== 'string') {
+        return `El poder en la posición ${i + 1} no es un string.`;
+      }
+  
+      const poderLimpio = poder.trim();
+  
+      if (poderLimpio.length < 3) {
+        return `El poder "${poder}" debe tener al menos 3 caracteres.`;
+      }
+  
+      if (poderLimpio.length > 60) {
+        return `El poder "${poder}" no debe superar los 60 caracteres.`;
+      }
+  
+      if (poderLimpio !== poder) {
+        return `El poder "${poder}" no debe tener espacios al inicio o al final.`;
+      }
+    }
+  
+    return null;
+  }
+  
+  
 export async function obtenerSuperheroePorIdController(req,res) {
    try{
         const{id} = req.params;
@@ -42,22 +110,50 @@ export async function obtenerTodosLosSuperheroesController(req,res){
 export const crearSuperheroeController = async (req, res) => {
 try {
     const { nombreSuperHeroe, nombreReal,  edad, planetaOrigen, debilidad, poderes, aliados, enemigos } = req.body;
-    if (!nombreReal || !nombreSuperHeroe || !edad || !poderes) {
-        return res.status(400).json({
-            mensaje: "Error al crear el superhéroe",
-            error: "Todos los campos son obligatorios"
-        });
-    }
 
+    // if (!nombreReal || !nombreSuperHeroe || !edad || !poderes) {
+    //     return res.status(400).json({
+    //         mensaje: "Error al crear el superhéroe",
+    //         error: "Todos los campos son obligatorios"
+    //     });
+    // }
+ 
+    const error = validarNombreSuperheroe(nombreSuperHeroe)||validarNombreSuperheroe(nombreReal);
+    if (error) return res.status(400).json({ error });
+
+    const errorEdad = validarEdad(edad);
+    if (errorEdad) return res.status(400).json({ errorEdad });
+
+    const errorPoderes = validarPoderes(poderes);
+    if (errorPoderes) return res.status(400).json({ error: errorPoderes });
+
+
+    // if (nombreSuperHeroe.length < 3) {
+    //     return res.status(400).json({ error: 'El nombre debe tener al menos 3 caracteres.' });
+    //   }
+  
+    //   if (nombreSuperHeroe.length > 60) {
+    //     return res.status(400).json({ error: 'El nombre no debe superar los 60 caracteres.' });
+    //   }
+    //   if (nombreReal.length < 3) {
+    //     return res.status(400).json({ error: 'El nombre Real debe tener al menos 3 caracteres.' });
+    //   }
+  
+    //   if (nombreReal.length > 60) {
+    //     return res.status(400).json({ error: 'El nombre Real no debe superar los 60 caracteres.' });
+    //   }
     // Continuar con la creación del superhéroe
     
         const nuevoSuperheroe = new SuperHero({ 
-            nombreSuperHeroe, 
+            nombreSuperHeroe: nombreSuperHeroe.trim(),
+            edad: Number(edad),
+            poderes: poderes.map(p => p.trim()),
+            // nombreSuperHeroe, 
             nombreReal, 
-            edad,
+            //edad,
             planetaOrigen,
             debilidad,
-            poderes,
+            //poderes,
             aliados,
             enemigos
         });
@@ -69,6 +165,8 @@ try {
             error: error.message
         });
     }
+
+
 };
 
 export const actualizarSuperheroeController = async (req, res) => {
